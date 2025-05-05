@@ -63,23 +63,21 @@ impl Space {
             y: 0,
         }
     }
-}
 
-fn simulate(cells: Grid) -> Grid {
-    const DIRECTIONS: [(isize, isize); 8] = [
-        (0, 1),
-        (1, 0),
-        (0, -1),
-        (-1, 0),
-        (1, 1),
-        (-1, -1),
-        (1, -1),
-        (-1, 1),
-    ];
+    fn simulate(&mut self) {
+        const DIRECTIONS: [(isize, isize); 8] = [
+            (0, 1),
+            (1, 0),
+            (0, -1),
+            (-1, 0),
+            (1, 1),
+            (-1, -1),
+            (1, -1),
+            (-1, 1),
+        ];
 
-    let mut next_generation = cells;
-    for x in 0..SPACE_CELLS_X {
-        for y in 0..SPACE_CELLS_Y {
+        let mut next_generation = self.cells.clone();
+        for (x, y, cell) in self.iter() {
             let mut alive = 0;
 
             for (dx, dy) in DIRECTIONS {
@@ -88,13 +86,12 @@ fn simulate(cells: Grid) -> Grid {
 
                 if rx >= 0 && rx < SPACE_CELLS_X as isize && ry >= 0 && ry < SPACE_CELLS_Y as isize
                 {
-                    if cells[rx as usize][ry as usize] {
+                    if self.cells[rx as usize][ry as usize] {
                         alive += 1;
                     }
                 }
             }
 
-            let cell = cells[x][y];
             next_generation[x][y] = match (cell, alive) {
                 // Rule 1: Any live cell with fewer than two live neighbours dies, as if by underpopulation.
                 (true, x) if x < 2 => false,
@@ -108,9 +105,9 @@ fn simulate(cells: Grid) -> Grid {
                 (current, _) => current,
             };
         }
-    }
 
-    next_generation
+        self.cells = next_generation;
+    }
 }
 
 fn main() {
@@ -134,7 +131,7 @@ fn main() {
             space = Space::generate();
         }
 
-        space.cells = simulate(space.cells);
+        space.simulate();
 
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::BLACK);
