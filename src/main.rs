@@ -78,7 +78,7 @@ impl Space {
 
         let mut next_generation = self.cells.clone();
         for (x, y, cell) in self.iter() {
-            let mut alive = 0;
+            let mut alive_neighbours = 0;
 
             for (dx, dy) in DIRECTIONS {
                 let rx = x as isize + dx;
@@ -87,12 +87,12 @@ impl Space {
                 if rx >= 0 && rx < SPACE_CELLS_X as isize && ry >= 0 && ry < SPACE_CELLS_Y as isize
                 {
                     if self.cells[rx as usize][ry as usize] {
-                        alive += 1;
+                        alive_neighbours += 1;
                     }
                 }
             }
 
-            next_generation[x][y] = match (cell, alive) {
+            next_generation[x][y] = match (cell, alive_neighbours) {
                 // Rule 1: Any live cell with fewer than two live neighbours dies, as if by underpopulation.
                 (true, x) if x < 2 => false,
                 // Rule 2: Any live cell with two or three live neighbours lives on to the next generation.
